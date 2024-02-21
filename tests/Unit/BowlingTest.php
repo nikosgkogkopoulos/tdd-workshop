@@ -127,4 +127,19 @@ class BowlingTest extends TestCase
         // ASSERT
         $this->assertEquals($expected_result, $result);
     }
+
+    /**
+     * @test
+     */
+    public function it_returns_48_after_double_strikes(): void
+    {
+        // ARRANGE
+        $expected_result = 48;
+
+        // ACT
+        $result = app(BowlingCalculator::class)->calculateScore([3,5,10,10,2,2]);
+
+        // ASSERT
+        $this->assertEquals($expected_result, $result);
+    }
 }

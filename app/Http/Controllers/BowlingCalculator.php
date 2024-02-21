@@ -4,10 +4,7 @@ namespace App\Http\Controllers;
 
 class BowlingCalculator extends Controller
 {
-
-    private bool $next_throw_is_double = false;
     private bool $throws_after_strike = false;
-    private bool $is_strike = false;
 
     public function calculateScore(array $throws): int
     {
@@ -64,9 +61,6 @@ class BowlingCalculator extends Controller
 
         return $total_score;
     }
-
-
-
 
     private function removeAlreadyUsedThrows(array $throws, int $num_of_throws_to_be_removed):array
     {
