@@ -32,7 +32,6 @@ class BowlingCalculator extends Controller
             $this->checkIfSpare($current_frame_score);
 
             $total_score += $total_frame_score;
-            var_dump($total_score);
             $frames = $this->removeAlreadyUsedFrames($frames);
         }
 
