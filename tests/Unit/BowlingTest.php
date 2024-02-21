@@ -52,6 +52,36 @@ class BowlingTest extends TestCase
         $this->assertEquals($expected_result, $result);
     }
 
+
+    /**
+     * @test
+     */
+    public function it_returns_14_for_no_spare(): void
+    {
+        // ARRANGE
+        $expected_result = 14;
+
+        // ACT
+        $result = app(BowlingCalculator::class)->calculateScore([3,5,5,1]);
+
+        // ASSERT
+        $this->assertEquals($expected_result, $result);
+    }
+
+    /**
+     * @test
+     */
+    public function it_returns_10_with_no_spare(): void
+    {
+        // ARRANGE
+        $expected_result = 10;
+
+        // ACT
+        $result = app(BowlingCalculator::class)->calculateScore([4,6]);
+
+        // ASSERT
+        $this->assertEquals($expected_result, $result);
+    }
     /**
      * @test
      */
@@ -77,6 +107,22 @@ class BowlingTest extends TestCase
 
         // ACT
         $result = app(BowlingCalculator::class)->calculateScore([4,6,1,9,5,2]);
+
+        // ASSERT
+        $this->assertEquals($expected_result, $result);
+    }
+
+
+    /**
+     * @test
+     */
+    public function it_returns_26_after_having_a_strike(): void
+    {
+        // ARRANGE
+        $expected_result = 26;
+
+        // ACT
+        $result = app(BowlingCalculator::class)->calculateScore([3,5,10,2,2]);
 
         // ASSERT
         $this->assertEquals($expected_result, $result);

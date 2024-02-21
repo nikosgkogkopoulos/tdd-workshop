@@ -6,65 +6,70 @@ class BowlingCalculator extends Controller
 {
 
     private bool $next_throw_is_double = false;
-    public function calculateScore(array $throws):int
+    private bool $throws_after_strike = false;
+    private bool $is_strike = false;
+
+    public function calculateScore(array $throws): int
     {
         $total_score = 0;
         $frames = [];
 
         // create frames
-        while(count($throws) >= 2){
-            $frame = [$throws[0], $throws[1]];
+        while (count($throws) >= 2) {
+            if ($throws[0] == 10) {
+                $frame = [$throws[0]];
+                $throws = $this->removeAlreadyUsedThrows($throws, 1);
+            } else {
+                $frame = [$throws[0], $throws[1]];
+                $throws = $this->removeAlreadyUsedThrows($throws, 2);
+            }
             $frames[] = $frame;
-            $throws = $this->removeAlreadyUsedThrows($throws);
         }
 
         // calculate frames
-        foreach($frames as $current_frame){
-            $current_frame_score = $current_frame[0] + $current_frame[1];
-            if($this->next_throw_is_double === true){
-                $total_frame_score = $current_frame_score + $current_frame[0];
-                $this->next_throw_is_double = false;
-            }
-            else{
-                $total_frame_score = $current_frame_score;
+        foreach ($frames as $index => $current_frame) {
+            // Calculate the score for the current frame
+            $current_frame_score = array_sum($current_frame);
+
+            // Add the score of the current frame to the total score
+            $total_score += $current_frame_score;
+
+            // calculate after strike
+            if ($this->throws_after_strike === true) {
+                $total_score += $current_frame_score;
+                $this->throws_after_strike = false;
             }
 
-            $this->checkIfSpare($current_frame_score);
+            // handle spare
+            if ($current_frame_score == 10 && count($current_frame) === 2 && $current_frame[0] !== 10) {
+                // If it's not the last frame, add the next frame's first throw as a bonus
+                if (isset($frames[$index + 1][0])) {
+                    $total_score += $frames[$index + 1][0];
+                } else {
+                    // If it's the last frame, add the next throw as a bonus
+                    $total_score += $throws[0] ?? 0;
+                }
+            }
 
-            $total_score += $total_frame_score;
-            $frames = $this->removeAlreadyUsedFrames($frames);
+            // handle strike
+            if ($current_frame_score == 10 && count($current_frame) === 1) {
+                $this->throws_after_strike = true;
+            }
         }
 
-        // calculate throws
-        foreach($throws as $throw){
-            if($this->next_throw_is_double === true){
-                $total_score += ($throw * 2);
-                $this->next_throw_is_double = false;
-            }else{
-                $total_score += $throw;
-            }
+        // calculate remaining throws
+        foreach ($throws as $throw) {
+            $total_score += $throw;
         }
 
         return $total_score;
     }
 
-    private function checkIfSpare( $current_frame_score):void
-    {
-        if($current_frame_score == 10){
-            $this->next_throw_is_double = true;
-        }
-    }
 
-    private function removeAlreadyUsedThrows(array $throws):array
-    {
-        unset($throws[0]);
-        unset($throws[1]);
-        return array_values($throws);
-    }
 
-    private function removeAlreadyUsedFrames(array $frames):array
+
+    private function removeAlreadyUsedThrows(array $throws, int $num_of_throws_to_be_removed):array
     {
-        unset($frames[0]);
-        return array_values($frames);
+        return array_slice($throws, $num_of_throws_to_be_removed);
     }
 }
